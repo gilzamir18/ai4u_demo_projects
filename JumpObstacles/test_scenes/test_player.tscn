@@ -1,14 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://bnr15cl4joj8d"]
+[gd_scene load_steps=13 format=3 uid="uid://bnr15cl4joj8d"]
 
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="2_kt00k"]
 [ext_resource type="PackedScene" uid="uid://bmfu5jsag6ccl" path="res://player/player.tscn" id="2_rln4e"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="3_yi2u1"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBMoveActuator.cs" id="4_rki3o"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="6_7c8of"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/WASDPhysicsMoveController.cs" id="6_bewwt"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBRespawnActuator.cs" id="7_mby5y"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/CollisionWithRewardFunc.cs" id="7_xsn0l"]
 [ext_resource type="PackedScene" uid="uid://c2yre7l2ks3fi" path="res://prefabs/Block.tscn" id="8_kh1t1"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/LinearRayCastingSensor.cs" id="8_u6yah"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/TouchRewardFunc.cs" id="9_ev2kd"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/FloatArrayCompositeSensor.cs" id="9_fw3sp"]
 [ext_resource type="Script" path="res://test_scenes/SliderJumpPower.cs" id="9_gsner"]
 
 [node name="TestPlayer" type="Node3D"]
@@ -30,6 +32,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47995, 1, -1.13144)
 [node name="Eye" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.603841, 0.431299)
 
+[node name="Eye2" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.589902, 0.431299)
+
+[node name="Eye3" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.603841, 0.431299)
+
 [node name="Agent" type="Node" parent="Player"]
 script = ExtResource("3_yi2u1")
 avatarPath = NodePath("..")
@@ -48,10 +56,10 @@ actionName = "move"
 script = ExtResource("6_bewwt")
 speed = 1.0
 
-[node name="CollisionWithBoxReward" type="Node" parent="Player/Agent" groups=["block"]]
-script = ExtResource("7_xsn0l")
-reward = 1.0
-group = "block"
+[node name="FallReward" type="Node" parent="Player/Agent" groups=["block"]]
+script = ExtResource("6_7c8of")
+threshold = -10.0
+causeEpisodeToEnd = true
 
 [node name="Respawn" type="Node" parent="Player/Agent"]
 script = ExtResource("7_mby5y")
@@ -59,19 +67,53 @@ respawnOptionsPath = NodePath("../../../PlayerPosition")
 actionName = "respawn"
 isOutput = false
 
-[node name="Vision" type="Node" parent="Player/Agent" node_paths=PackedStringArray("eye")]
+[node name="TouchBlock2" type="Node" parent="Player/Agent" node_paths=PackedStringArray("target")]
+script = ExtResource("9_ev2kd")
+reward = 1.0
+target = NodePath("../../../Block2")
+
+[node name="TouchBlock3" type="Node" parent="Player/Agent" node_paths=PackedStringArray("target")]
+script = ExtResource("9_ev2kd")
+reward = 2.0
+target = NodePath("../../../Block3")
+
+[node name="ArraySensor" type="Node" parent="Player/Agent"]
+script = ExtResource("9_fw3sp")
+stackedObservations = 4
+
+[node name="Vision" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
 script = ExtResource("8_u6yah")
-eye = NodePath("../../Eye")
+eye = NodePath("../../../Eye")
+verticalShift = 60.0
 debugEnabled = true
 perceptionKey = "array"
+isInput = false
 
-[node name="Block" parent="." instance=ExtResource("8_kh1t1")]
+[node name="Vision2" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+eye = NodePath("../../../Eye2")
+verticalShift = 0.0
+debugEnabled = true
+debugColor = Color(0.823529, 0.972549, 0, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision3" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+eye = NodePath("../../../Eye3")
+verticalShift = -60.0
+debugEnabled = true
+debugColor = Color(1, 1, 1, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Block" parent="." groups=["block_1"] instance=ExtResource("8_kh1t1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.499866, -0.0369017, -1.03151)
 
-[node name="Block2" parent="." instance=ExtResource("8_kh1t1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.430745, 2.4651, 3.68259)
+[node name="Block2" parent="." groups=["block_2"] instance=ExtResource("8_kh1t1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.430745, 2.12, 3.68259)
 
-[node name="Block3" parent="." instance=ExtResource("8_kh1t1")]
+[node name="Block3" parent="." groups=["block_3"] instance=ExtResource("8_kh1t1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7726, 4.34749, 2.9538)
 
 [node name="PlayerPosition" type="Node3D" parent="."]
