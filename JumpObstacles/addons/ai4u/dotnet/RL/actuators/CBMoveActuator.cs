@@ -19,12 +19,10 @@ public partial class CBMoveActuator : Actuator
     [Export]
     private float jumpForwardPower = 1;
     [Export]
-    private float collisionShapeHalfHeight = 1.0f;
-    [Export]
     private float precision = 0.001f;
     [Export]
     private float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
-
+    [Export]
     private float lerpFactor = 0.4f;
 
 
@@ -89,16 +87,10 @@ public partial class CBMoveActuator : Actuator
             // Add the gravity.
             if (!body.IsOnFloor())
             {
-			    velocity.Y -= gravity * (float)delta;
+			    velocity.Y -= gravity;
             }
             else
             {
-                if (jump > 0)
-                {
-                    velocity.Y = jump * jumpPower;
-                }
-
-                
                 if ( Math.Abs(turn) > 0)
                 {
                     var newdirection = Quaternion.FromEuler(new Vector3(0, turn * turnAmount, 0)) * body.Basis.Z;
@@ -107,20 +99,47 @@ public partial class CBMoveActuator : Actuator
 
                     body.LookAt(targetposition);
                 }
-                
-                
-                // Get the input direction and handle the movement/deceleration.
-                Vector3 direction = (body.Transform.Basis.Z * move).Normalized();
 
-                
-                if (direction != Vector3.Zero)
+                // Get the input direction and handle the movement/deceleration.
+                Vector3 direction = body.Transform.Basis.Z.Normalized();
+
+                if (jump > 0)
                 {
-                    velocity = direction * moveAmount;
+                    velocity += body.Transform.Basis.Y * jump * jumpPower;
                 }
-                else
+
+                bool forwarding = false;
+
+                if (jumpForward > 0)
                 {
-                    velocity.X = Mathf.Lerp(body.Velocity.X, 0, lerpFactor);
-                    velocity.Z = Mathf.Lerp(body.Velocity.Z, 0, lerpFactor);
+                    velocity += body.Transform.Basis.Y * jumpForward * jumpPower;
+                    velocity += body.Transform.Basis.Z * jumpForwardPower * jumpForward;
+                    forwarding = true;
+                }
+                
+                if (Mathf.Abs(move) > precision)
+                {
+                    velocity +=  body.Transform.Basis.Z * moveAmount * move;
+                    forwarding = true;    
+                }
+
+                if (!forwarding)
+                {
+                    var o = body.Transform.Basis.Z;
+                    if (Mathf.Abs(o.X) > precision)
+                    {
+                        velocity.X = Mathf.Lerp(velocity.X, 0, lerpFactor);
+                    }
+
+                    if (Mathf.Abs(o.Y) > precision)
+                    {
+                        velocity.Y = Mathf.Lerp(velocity.Y, 0, lerpFactor);
+                    }
+
+                    if (Mathf.Abs(o.Z) > precision)
+                    {
+                        velocity.Z = Mathf.Lerp(velocity.Z, 0, lerpFactor);
+                    }
                 }
             }
             body.Velocity = velocity;

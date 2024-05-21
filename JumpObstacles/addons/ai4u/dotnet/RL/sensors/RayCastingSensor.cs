@@ -233,17 +233,17 @@ namespace ai4u
 			if (debugEnabled)
 			{
 				if (isTagged) {
-					GetNode<LineDrawer>("/root/LineDrawer").Draw_Line3D(debug_line, myray.Origin, 
+					/*GetNode<LineDrawer>("/root/LineDrawer").Draw_Line3D(debug_line, myray.Origin, 
 																		myray.Origin + myray.Direction * visionMaxDistance, 
-																		detectionSuccessColor, new Color(0, 1, 0, 1), 1, 10);
+																		detectionSuccessColor, new Color(0, 1, 0, 1), 1, 10);*/
 				} else 
 				{
-					GetNode<LineDrawer>("/root/LineDrawer").Draw_Line3D(debug_line, myray.Origin, 
+					/*GetNode<LineDrawer>("/root/LineDrawer").Draw_Line3D(debug_line, myray.Origin, 
 																			myray.Origin + myray.Direction * visionMaxDistance, 
 																			detectionFailColor, 
-																			new Color(0, 0, 0, 1), 1, 10);					
+																			new Color(0, 0, 0, 1), 1, 10); */					
 				}
-				GetNode<LineDrawer>("/root/LineDrawer").Redraw();
+				/*GetNode<LineDrawer>("/root/LineDrawer").Redraw();*/
 			}
 		}
 
