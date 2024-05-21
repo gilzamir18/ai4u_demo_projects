@@ -1,14 +1,14 @@
 [gd_scene load_steps=11 format=3 uid="uid://bnr15cl4joj8d"]
 
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/ControlRequestor.cs" id="2_kt00k"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="2_kt00k"]
 [ext_resource type="PackedScene" uid="uid://bmfu5jsag6ccl" path="res://player/player.tscn" id="2_rln4e"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/agents/BasicAgent.cs" id="3_yi2u1"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/actuators/CBMoveActuator.cs" id="4_rki3o"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/controllers/WASDPhysicsMoveController.cs" id="6_bewwt"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/actuators/CBRespawnActuator.cs" id="7_mby5y"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/events/CollisionWithRewardFunc.cs" id="7_xsn0l"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/RL/sensors/LinearRayCastingSensor.cs" id="8_advtt"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="3_yi2u1"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBMoveActuator.cs" id="4_rki3o"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/WASDPhysicsMoveController.cs" id="6_bewwt"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBRespawnActuator.cs" id="7_mby5y"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/CollisionWithRewardFunc.cs" id="7_xsn0l"]
 [ext_resource type="PackedScene" uid="uid://c2yre7l2ks3fi" path="res://prefabs/Block.tscn" id="8_kh1t1"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/LinearRayCastingSensor.cs" id="8_u6yah"]
 [ext_resource type="Script" path="res://test_scenes/SliderJumpPower.cs" id="9_gsner"]
 
 [node name="TestPlayer" type="Node3D"]
@@ -60,15 +60,9 @@ actionName = "respawn"
 isOutput = false
 
 [node name="Vision" type="Node" parent="Player/Agent" node_paths=PackedStringArray("eye")]
-script = ExtResource("8_advtt")
-groupCode = PackedInt32Array(50, 100, 200, 250)
-groupName = PackedStringArray("floor", "player", "block", "target")
-numberOfRays = 30
+script = ExtResource("8_u6yah")
 eye = NodePath("../../Eye")
-verticalShift = 0.0
-visionMaxDistance = 10.0
 debugEnabled = true
-debugColor = Color(0.971391, 0.715771, 0, 1)
 perceptionKey = "array"
 
 [node name="Block" parent="." instance=ExtResource("8_kh1t1")]
