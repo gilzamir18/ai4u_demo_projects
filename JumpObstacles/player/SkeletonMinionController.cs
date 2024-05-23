@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ai4u;
 
-public partial class SkeletonMinionController : Node3D
+public partial class SkeletonMinionController : Node3D, IAgentResetListener
 {
 	[Export]
 	private BasicAgent agent;
@@ -16,16 +16,26 @@ public partial class SkeletonMinionController : Node3D
 
 	private CharacterBody3D characterBody3D;
 
-	private AnimationPlayer animationPlayer;
+	private AnimationTree animationTree;
+
+	private Vector3 animVelocity;
+
+	private bool onFloor = false;
+	private float jumpForce = 0;
+
+	private float turn = 0;
+
+	private float move = 0;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+		animationTree = GetNode<AnimationTree>("AnimationTree");
 		if (agent != null)
 		{
 			characterBody3D = agent.GetAvatarBody() as CharacterBody3D;
-			agent.beginOfStepEvent += PlayAnimation;
+			agent.endOfStepEvent += PlayAnimation;
+			agent.AddResetListener(this);
 		}
 	}
 
@@ -33,53 +43,21 @@ public partial class SkeletonMinionController : Node3D
 	public  void PlayAnimation(BasicAgent agent)
 	{
 		float[] actions = agent.GetActionArgAsFloatArray();
-		if (characterBody3D != null)
-		{
-			if (characterBody3D.IsOnFloor())
-			{
-
-				if (actions[JUMP] > 0 && actions[JUMP] <= 0.2f)
-				{
-					animationPlayer.Play("Jump_Start");
-				}
-				else if (actions[JUMP] > 0.2f)
-				{
-					animationPlayer.Play("Jump_Full_Long", customBlend:0.9);
-				}
-				else if (characterBody3D.Velocity.Length() > 0.05f && characterBody3D.Velocity.Length() < 5)
-				{
-					animationPlayer.Play("Walking_A", customBlend:0.9);
-				}
-				else if (characterBody3D.Velocity.Length() >= 5)
-				{
-					animationPlayer.Play("Running_A", customBlend:0.9);
-				}
-				else if ( Math.Abs(actions[TURN]) > 0.05f)
-				{
-					animationPlayer.Play("Walking_A", customBlend:0.9, customSpeed: Math.Abs(actions[TURN]));
-				}
-				else
-				{
-					animationPlayer.Play("Idle", customBlend:0.9);
-				}
-			}
-			else
-			{
-				if (characterBody3D.Velocity.Y > 0)
-				{
-					animationPlayer.Play("Jump_Full_Long");
-				}
-				else if (characterBody3D.Velocity.Y < 0)
-				{
-					animationPlayer.Play("Jump_Idle");
-				}
-			}
-		}
-		else
-		{
-			animationPlayer.Play("Idle");
-		}
-
+		jumpForce = actions[JUMP] + actions[JUMP_FORWARD]; 
+		animVelocity = characterBody3D.GetRealVelocity(); 
+		turn = actions[TURN];
+		move = actions[MOVE];
 		pActions = actions;
+		onFloor = characterBody3D.IsOnFloor();
+		GD.Print(animVelocity);
+	}
+
+	public void OnReset(Agent agent)
+	{
+		animVelocity = Vector3.Zero;
+		onFloor = false;
+		jumpForce = 0;
+		turn = 0;
+		move = 0;
 	}
 }
