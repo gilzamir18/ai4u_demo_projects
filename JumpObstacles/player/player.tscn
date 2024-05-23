@@ -16,6 +16,7 @@ albedo_color = Color(0.4, 0, 0.309804, 1)
 
 [node name="Arrow" parent="." instance=ExtResource("1_lswym")]
 transform = Transform3D(0.2, 0, 0, 0, -8.74228e-09, -0.2, 0, 0.2, -8.74228e-09, 0.0173218, 0.622914, 0.0214022)
+visible = false
 
 [node name="Arrow" parent="Arrow" index="0"]
 surface_material_override/0 = SubResource("StandardMaterial3D_6kdyy")
@@ -24,6 +25,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_6kdyy")
 shape = SubResource("CapsuleShape3D_bfqwl")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("CapsuleMesh_s0xx8")
 surface_material_override/0 = SubResource("StandardMaterial3D_yg6y7")
 

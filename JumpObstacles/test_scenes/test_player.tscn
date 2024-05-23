@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://bnr15cl4joj8d"]
+[gd_scene load_steps=14 format=3 uid="uid://bnr15cl4joj8d"]
 
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="2_kt00k"]
 [ext_resource type="PackedScene" uid="uid://bmfu5jsag6ccl" path="res://player/player.tscn" id="2_rln4e"]
+[ext_resource type="PackedScene" uid="uid://cd8u8gum8otkh" path="res://player/skeleton_minion.tscn" id="3_exny4"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="3_yi2u1"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBMoveActuator.cs" id="4_rki3o"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="6_7c8of"]
@@ -23,11 +24,15 @@ script = ExtResource("2_kt00k")
 stopOnQuit = true
 agentsList = [NodePath("../Player/Agent")]
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, -3.55271e-15, 8.74228e-08, 6.64996e-08, 0.649143, 0.760667, -5.67499e-08, 0.760667, -0.649143, 1.52681, 8.05188, -5.00894)
-
 [node name="Player" parent="." groups=["group"] instance=ExtResource("2_rln4e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47995, 1, -1.13144)
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(-1, -2.84217e-14, 8.74228e-08, 6.64996e-08, 0.649143, 0.760667, -5.67499e-08, 0.760667, -0.649143, 3.59214, 6.97599, -2.45389)
+
+[node name="Skeleton_Minion" parent="Player" node_paths=PackedStringArray("agent") instance=ExtResource("3_exny4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0491562, -1, -0.200595)
+agent = NodePath("../Agent")
 
 [node name="Eye" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.603841, 0.431299)
@@ -85,7 +90,6 @@ stackedObservations = 4
 script = ExtResource("8_u6yah")
 eye = NodePath("../../../Eye")
 verticalShift = 60.0
-debugEnabled = true
 perceptionKey = "array"
 isInput = false
 
@@ -93,7 +97,6 @@ isInput = false
 script = ExtResource("8_u6yah")
 eye = NodePath("../../../Eye2")
 verticalShift = 0.0
-debugEnabled = true
 debugColor = Color(0.823529, 0.972549, 0, 1)
 perceptionKey = "array"
 isInput = false
@@ -102,7 +105,6 @@ isInput = false
 script = ExtResource("8_u6yah")
 eye = NodePath("../../../Eye3")
 verticalShift = -60.0
-debugEnabled = true
 debugColor = Color(1, 1, 1, 1)
 perceptionKey = "array"
 isInput = false
