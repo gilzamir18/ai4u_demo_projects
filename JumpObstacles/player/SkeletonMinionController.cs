@@ -49,7 +49,7 @@ public partial class SkeletonMinionController : Node3D, IAgentResetListener
 		move = actions[MOVE];
 		pActions = actions;
 		onFloor = characterBody3D.IsOnFloor();
-		GD.Print(animVelocity);
+		//GD.Print(animVelocity);
 	}
 
 	public void OnReset(Agent agent)

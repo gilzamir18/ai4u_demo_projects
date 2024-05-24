@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bnr15cl4joj8d"]
+[gd_scene load_steps=19 format=3 uid="uid://bnr15cl4joj8d"]
 
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="2_kt00k"]
 [ext_resource type="PackedScene" uid="uid://bmfu5jsag6ccl" path="res://player/player.tscn" id="2_rln4e"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/TouchRewardFunc.cs" id="9_ev2kd"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/FloatArrayCompositeSensor.cs" id="9_fw3sp"]
 [ext_resource type="Script" path="res://test_scenes/SliderJumpPower.cs" id="9_gsner"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/GroundStatusSensor.cs" id="12_6yfrc"]
 [ext_resource type="Texture2D" uid="uid://c23hvocfimhpf" path="res://environment/kloppenheim_05_puresky_4k.hdr" id="14_k32tg"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t53sd"]
@@ -34,11 +35,15 @@ light_volumetric_fog_energy = 2.135
 
 [node name="Requestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
 script = ExtResource("2_kt00k")
+defaultTimeScale = 10.0
 stopOnQuit = true
 agentsList = [NodePath("../Player/Agent")]
 
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-1, -6.21725e-14, 8.74228e-08, 1.04133e-08, 0.992881, 0.119115, -8.68004e-08, 0.119115, -0.992881, 2.0233, 3.60621, -7.03158)
+
 [node name="Player" parent="." groups=["group"] instance=ExtResource("2_rln4e")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47995, 1, -1.13144)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47995, 1.13436, -1.13144)
 
 [node name="Skeleton_Minion" parent="Player" node_paths=PackedStringArray("agent") instance=ExtResource("3_exny4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0491562, -1, -0.200595)
@@ -56,13 +61,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.603841, 0.431299)
 [node name="Agent" type="Node" parent="Player"]
 script = ExtResource("3_yi2u1")
 avatarPath = NodePath("..")
+remote = true
 doneAtNegativeReward = false
 MaxStepsPerEpisode = 1000
 
 [node name="Movement" type="Node" parent="Player/Agent"]
 script = ExtResource("4_rki3o")
 moveAmount = 3.0
-turnAmount = 3.0
+turnAmount = 10.0
 jumpPower = 50.0
 jumpForwardPower = 50.0
 actionName = "move"
@@ -94,10 +100,13 @@ target = NodePath("../../../Block3")
 
 [node name="ArraySensor" type="Node" parent="Player/Agent"]
 script = ExtResource("9_fw3sp")
+perceptionKey = "array"
 stackedObservations = 4
 
 [node name="Vision" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
 script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
 eye = NodePath("../../../Eye")
 verticalShift = 60.0
 perceptionKey = "array"
@@ -105,6 +114,8 @@ isInput = false
 
 [node name="Vision2" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
 script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
 eye = NodePath("../../../Eye2")
 verticalShift = 0.0
 debugColor = Color(0.823529, 0.972549, 0, 1)
@@ -113,14 +124,18 @@ isInput = false
 
 [node name="Vision3" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
 script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
 eye = NodePath("../../../Eye3")
 verticalShift = -60.0
 debugColor = Color(1, 1, 1, 1)
 perceptionKey = "array"
 isInput = false
 
-[node name="Camera3D" type="Camera3D" parent="Player"]
-transform = Transform3D(-1, -2.57572e-14, 8.74228e-08, 1.04133e-08, 0.992881, 0.119115, -8.68004e-08, 0.119115, -0.992881, 2.50325, 2.60621, -5.90014)
+[node name="GroundSensor" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("moveActuator")]
+script = ExtResource("12_6yfrc")
+moveActuator = NodePath("../../Movement")
+isInput = false
 
 [node name="Block" parent="." groups=["block_1"] instance=ExtResource("8_kh1t1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.499866, -0.0369017, -1.03151)
@@ -132,7 +147,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.430745, 2.12, 3.68259)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7726, 4.34749, 2.9538)
 
 [node name="PlayerPosition" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.5)
 
 [node name="CanvasGroup" type="CanvasGroup" parent="."]
 
