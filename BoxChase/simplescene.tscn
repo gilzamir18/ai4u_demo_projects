@@ -1,0 +1,253 @@
+[gd_scene load_steps=23 format=3 uid="uid://bmnf1pmaxkvv5"]
+
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="1_ckp2k"]
+[ext_resource type="PackedScene" uid="uid://5ikmnjyidtck" path="res://addons/ai4u/3DModel/Arrow.dae" id="1_kiqyk"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/RBMoveActuator.cs" id="3_tlu8w"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/LinearRayCastingSensor.cs" id="4_1elh4"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/MinDistReward.cs" id="5_nkaqn"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/TouchRewardFunc.cs" id="6_afios"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/RBRespawnActuator.cs" id="7_lwuy7"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="8_hgrol"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/FloatArrayCompositeSensor.cs" id="8_vphps"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/OrientationSensor.cs" id="9_4vlpf"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/ActionSensor.cs" id="10_monn0"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="11_oe0ee"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/ArrowPhysicsMoveController.cs" id="13_tx0gm"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l3602"]
+size = Vector3(10, 0.1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ml32t"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orivf"]
+albedo_color = Color(0, 0.882353, 0.568627, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7d1uu"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_668g2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b6kah"]
+albedo_color = Color(0.356863, 0.537255, 1, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_768m2"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vl1w0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jxcle"]
+albedo_color = Color(0.815686, 0.152941, 1, 1)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Floor" type="StaticBody3D" parent="." groups=["Floor", "floor"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_l3602")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(10.767, 0, 0, 0, 0.1, 0, 0, 0, 10.7284, 0, 0, 0)
+mesh = SubResource("BoxMesh_ml32t")
+surface_material_override/0 = SubResource("StandardMaterial3D_orivf")
+
+[node name="Target" type="RigidBody3D" parent="." groups=["target"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.39414, 0.57379, 0)
+lock_rotation = true
+freeze = true
+max_contacts_reported = 100
+contact_monitor = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Target"]
+shape = SubResource("BoxShape3D_7d1uu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Target"]
+mesh = SubResource("BoxMesh_668g2")
+surface_material_override/0 = SubResource("StandardMaterial3D_b6kah")
+
+[node name="AgentBody" type="RigidBody3D" parent="." groups=["player"]]
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+sleeping = true
+can_sleep = false
+continuous_cd = true
+max_contacts_reported = 10000
+contact_monitor = true
+angular_damp = 5.0
+
+[node name="Arrow" parent="AgentBody" instance=ExtResource("1_kiqyk")]
+transform = Transform3D(0.2, 0, 0, 0, -8.74228e-09, -0.2, 0, 0.2, -8.74228e-09, 0, 1.29594, 0.474278)
+
+[node name="FrontalRef" type="Node3D" parent="AgentBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.29207, 0.817245)
+
+[node name="BackRef" type="Node3D" parent="AgentBody"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -4.27985e-08, 1.36766, -0.489557)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AgentBody"]
+shape = SubResource("CapsuleShape3D_768m2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AgentBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.859779, 0)
+mesh = SubResource("CapsuleMesh_vl1w0")
+surface_material_override/0 = SubResource("StandardMaterial3D_jxcle")
+
+[node name="Agent" type="Node" parent="AgentBody" node_paths=PackedStringArray("avatarBody")]
+script = ExtResource("1_ckp2k")
+avatarBody = NodePath("..")
+remote = true
+doneAtNegativeReward = false
+MaxStepsPerEpisode = 3000
+
+[node name="Actuator" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("3_tlu8w")
+moveAmount = 5.0
+turnAmount = 5.0
+jumpPower = 0.0
+jumpForwardPower = 0.0
+actionName = "move"
+
+[node name="RayCastingSensor" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("8_vphps")
+perceptionKey = "vision"
+stackedObservations = 4
+
+[node name="FrontalSensor1" type="Node" parent="AgentBody/Agent/RayCastingSensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("4_1elh4")
+groupCode = PackedInt32Array(50, 130, 255)
+groupName = PackedStringArray("floor", "player", "target")
+numberOfRays = 5
+eye = NodePath("../../../FrontalRef")
+fieldOfView = 120.0
+verticalShift = -15.0
+returnDistance = true
+normalizeDistance = true
+debugEnabled = true
+debugColor = Color(1, 1, 0.231373, 1)
+perceptionKey = "vision"
+stackedObservations = 4
+
+[node name="FrontalSensor2" type="Node" parent="AgentBody/Agent/RayCastingSensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("4_1elh4")
+groupCode = PackedInt32Array(50, 130, 255)
+groupName = PackedStringArray("floor", "player", "target")
+numberOfRays = 5
+eye = NodePath("../../../FrontalRef")
+fieldOfView = 120.0
+verticalShift = -30.0
+returnDistance = true
+normalizeDistance = true
+debugEnabled = true
+debugColor = Color(1, 1, 0.231373, 1)
+perceptionKey = "vision"
+stackedObservations = 4
+
+[node name="FrontalSensor3" type="Node" parent="AgentBody/Agent/RayCastingSensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("4_1elh4")
+groupCode = PackedInt32Array(50, 130, 255)
+groupName = PackedStringArray("floor", "player", "target")
+numberOfRays = 5
+eye = NodePath("../../../FrontalRef")
+fieldOfView = 120.0
+verticalShift = -60.0
+returnDistance = true
+normalizeDistance = true
+debugEnabled = true
+debugColor = Color(1, 1, 0.231373, 1)
+perceptionKey = "vision"
+stackedObservations = 4
+
+[node name="BackSensor1" type="Node" parent="AgentBody/Agent/RayCastingSensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("4_1elh4")
+groupCode = PackedInt32Array(50, 130, 255)
+groupName = PackedStringArray("floor", "player", "target")
+numberOfRays = 1
+eye = NodePath("../../../BackRef")
+fieldOfView = 120.0
+verticalShift = -80.0
+returnDistance = true
+normalizeDistance = true
+debugEnabled = true
+debugColor = Color(1, 1, 0.231373, 1)
+perceptionKey = "vision"
+stackedObservations = 4
+
+[node name="MinDist" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("5_nkaqn")
+target = NodePath("../../../Target")
+
+[node name="TouchReward" type="Node" parent="AgentBody/Agent" node_paths=PackedStringArray("target")]
+script = ExtResource("6_afios")
+reward = 100.0
+target = NodePath("../../../Target")
+causeEpisodeToEnd = true
+
+[node name="Respawn" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("7_lwuy7")
+respawnOptionsPath = NodePath("../../../RespawnOptions")
+actionName = "respawn"
+isOutput = false
+
+[node name="ArraySensor" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("8_vphps")
+perceptionKey = "array"
+
+[node name="OrientationSensor" type="Node" parent="AgentBody/Agent/ArraySensor" node_paths=PackedStringArray("target", "reference")]
+script = ExtResource("9_4vlpf")
+target = NodePath("../../../../Target")
+reference = NodePath("../../..")
+perceptionKey = "orientation"
+
+[node name="ActionSensor" type="Node" parent="AgentBody/Agent/ArraySensor"]
+script = ExtResource("10_monn0")
+actionName = "move"
+actionSize = 4
+perceptionKey = "actions"
+
+[node name="FallReward" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("11_oe0ee")
+causeEpisodeToEnd = true
+
+[node name="HumanController" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("13_tx0gm")
+speed = 1.0
+
+[node name="ControlRequestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
+script = ExtResource("8_hgrol")
+defaultTimeScale = 10.0
+stopOnQuit = true
+agentsList = [NodePath("../AgentBody/Agent")]
+
+[node name="RespawnOptions" type="Node" parent="."]
+script = ExtResource("7_lwuy7")
+respawnOptionsPath = NodePath(".")
+early = false
+actionName = "respawn"
+isOutput = false
+
+[node name="r1" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="r2" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.78631, 0, -0.617832, 0, 1, 0, 0.617832, 0, -0.78631, 3.528, 1, 0.506)
+
+[node name="r3" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -3.607)
+
+[node name="r4" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 0, 1, 4)
+
+[node name="r5" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, -1.7015, 1, -3.07086)
+
+[node name="r6" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 3.92625, 1, -3.07086)
+
+[node name="r7" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 3.92625, 1, 4.80128)
+
+[node name="r8" type="Node3D" parent="RespawnOptions"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 3.92625, 1, 0.144996)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.881995, 0.471258, 0, -0.471258, 0.881995, 0, 5.33702, 7.68783)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.110758, 0.993847, 0, -0.993847, 0.110758, 0, 5, 0)
