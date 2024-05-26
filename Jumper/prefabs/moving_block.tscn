@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwp5gtic18t46"]
+
+[ext_resource type="PackedScene" uid="uid://c2yre7l2ks3fi" path="res://prefabs/Block.tscn" id="1_oapkj"]
+[ext_resource type="Script" path="res://prefabs/MovingBlock.cs" id="2_yk4q1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ens65"]
+size = Vector3(3.97617, 0.346069, 3.46671)
+
+[node name="MovingBlock" instance=ExtResource("1_oapkj")]
+script = ExtResource("2_yk4q1")
+
+[node name="Area3D" type="Area3D" parent="." index="2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.371475, 0.0159302, 0.00193787)
+shape = SubResource("BoxShape3D_ens65")
+
+[connection signal="body_entered" from="Area3D" to="." method="OnBodyEntered"]
+[connection signal="body_exited" from="Area3D" to="." method="OnBodyExited"]

@@ -4,4 +4,5 @@ Here, we will include AI4U demo projects that you can use for experimentation.
 
 |             Project Name           |  Type              |
 |------------------------------------|--------------------|
-| [JumpObstacles](JumpObstacles/)    | 3D                 |
+| [Jumper](Jumper/)                  | 3D                 |
+| [BoxChase](BoxChase/)                | 3D                 |

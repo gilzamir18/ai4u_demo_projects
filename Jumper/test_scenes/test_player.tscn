@@ -1,0 +1,231 @@
+[gd_scene load_steps=19 format=3 uid="uid://bnr15cl4joj8d"]
+
+[ext_resource type="Script" path="res://test_scenes/GameManager.cs" id="1_tnbpj"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="2_kt00k"]
+[ext_resource type="PackedScene" uid="uid://bmfu5jsag6ccl" path="res://player/player.tscn" id="2_rln4e"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="3_yi2u1"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/CBMoveActuator.cs" id="4_rki3o"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/ArrowPhysicsMoveController.cs" id="8_coqg3"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/LinearRayCastingSensor.cs" id="8_u6yah"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/FloatArrayCompositeSensor.cs" id="9_fw3sp"]
+[ext_resource type="Script" path="res://test_scenes/SliderJumpPower.cs" id="9_gsner"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/OrientationSensor.cs" id="11_gvp3t"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/GroundStatusSensor.cs" id="12_6yfrc"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/DynamicFallReward.cs" id="12_wjevu"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/MinDistReward.cs" id="13_uhf55"]
+[ext_resource type="Texture2D" uid="uid://c23hvocfimhpf" path="res://environment/kloppenheim_05_puresky_4k.hdr" id="14_k32tg"]
+[ext_resource type="PackedScene" uid="uid://dwp5gtic18t46" path="res://prefabs/moving_block.tscn" id="17_xngjd"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t53sd"]
+panorama = ExtResource("14_k32tg")
+
+[sub_resource type="Sky" id="Sky_u7gw8"]
+sky_material = SubResource("PanoramaSkyMaterial_t53sd")
+
+[sub_resource type="Environment" id="Environment_yk3il"]
+background_mode = 2
+background_energy_multiplier = 0.81
+sky = SubResource("Sky_u7gw8")
+
+[node name="TestPlayer" type="Node3D"]
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("agent", "fallReward", "agentTarget")]
+script = ExtResource("1_tnbpj")
+agent = NodePath("../Player/Agent")
+movingBlockScene = ExtResource("17_xngjd")
+fallReward = NodePath("../Player/Agent/FallReward")
+agentTarget = NodePath("../AgentTarget")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.708438, 0.705773, 0, -0.705773, 0.708438, 0, 4.50605, 0)
+light_volumetric_fog_energy = 2.135
+
+[node name="Requestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
+script = ExtResource("2_kt00k")
+stopOnQuit = true
+agentsList = [NodePath("../Player/Agent")]
+
+[node name="Player" parent="." groups=["group", "player"] instance=ExtResource("2_rln4e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47995, 1.90087, -1.13144)
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(-1, -6.30607e-14, 8.74228e-08, 1.04133e-08, 0.992881, 0.119115, -8.68004e-08, 0.119115, -0.992881, 2.50325, 1.70534, -5.90014)
+
+[node name="Eye" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.603841, 0.431299)
+
+[node name="Eye2" type="Node3D" parent="Player"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.603841, -0.679716)
+
+[node name="Agent" type="Node" parent="Player" node_paths=PackedStringArray("avatarBody")]
+script = ExtResource("3_yi2u1")
+avatarBody = NodePath("..")
+remote = true
+doneAtNegativeReward = false
+MaxStepsPerEpisode = 600
+
+[node name="Movement" type="Node" parent="Player/Agent"]
+script = ExtResource("4_rki3o")
+moveAmount = 10.0
+turnAmount = 10.0
+jumpPower = 70.0
+jumpForwardPower = 50.0
+actionName = "move"
+
+[node name="MoveController" type="Node" parent="Player/Agent"]
+script = ExtResource("8_coqg3")
+speed = 1.0
+
+[node name="ArraySensor" type="Node" parent="Player/Agent"]
+script = ExtResource("9_fw3sp")
+perceptionKey = "array"
+stackedObservations = 4
+
+[node name="Vision" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = 60.0
+returnDistance = true
+normalizeDistance = true
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision1" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+returnDistance = true
+normalizeDistance = true
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision2" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = 10.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(0.823529, 0.972549, 0, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision3" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = -10.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(1, 1, 1, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision4" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = -30.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(0.960784, 0.458824, 0.964706, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision5" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = -50.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(0.960784, 0.458824, 0.964706, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision6" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye")
+verticalShift = -60.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(0.960784, 0.458824, 0.964706, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="Vision7" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("eye")]
+script = ExtResource("8_u6yah")
+groupCode = PackedInt32Array(50, 100, 255)
+groupName = PackedStringArray("block_1", "block_2", "block_3")
+numberOfRays = 5
+eye = NodePath("../../../Eye2")
+verticalShift = -90.0
+returnDistance = true
+normalizeDistance = true
+debugColor = Color(0.960784, 0.458824, 0.964706, 1)
+perceptionKey = "array"
+isInput = false
+
+[node name="GroundSensor" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("moveActuator")]
+script = ExtResource("12_6yfrc")
+moveActuator = NodePath("../../Movement")
+isInput = false
+
+[node name="Orientation" type="Node" parent="Player/Agent/ArraySensor" node_paths=PackedStringArray("target", "reference")]
+script = ExtResource("11_gvp3t")
+target = NodePath("../../../../AgentTarget")
+reference = NodePath("../../..")
+_normalized = true
+
+[node name="FallReward" type="Node" parent="Player/Agent"]
+script = ExtResource("12_wjevu")
+successReward = -20.0
+causeEpisodeToEnd = true
+
+[node name="TargetRewardFunc" type="Node" parent="Player/Agent"]
+script = ExtResource("13_uhf55")
+target = NodePath("../../../AgentTarget")
+
+[node name="PlayerPosition" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.5)
+
+[node name="CanvasGroup" type="CanvasGroup" parent="."]
+
+[node name="SliderJumpPower" type="HSlider" parent="CanvasGroup" node_paths=PackedStringArray("controller")]
+offset_left = 129.0
+offset_top = 6.0
+offset_right = 282.0
+offset_bottom = 22.0
+max_value = 1.0
+step = 0.01
+value = 0.9
+script = ExtResource("9_gsner")
+controller = NodePath("../../Player/Agent/MoveController")
+
+[node name="LblJumpPower" type="Label" parent="CanvasGroup"]
+offset_left = 24.0
+offset_top = 2.0
+offset_right = 118.0
+offset_bottom = 25.0
+text = "Jump Power"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_yk3il")
+
+[node name="AgentTarget" type="Node3D" parent="."]
