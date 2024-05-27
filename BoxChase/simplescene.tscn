@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://bmnf1pmaxkvv5"]
+[gd_scene load_steps=24 format=3 uid="uid://bmnf1pmaxkvv5"]
 
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="1_ckp2k"]
 [ext_resource type="PackedScene" uid="uid://5ikmnjyidtck" path="res://addons/ai4u/3DModel/Arrow.dae" id="1_kiqyk"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/OrientationSensor.cs" id="9_4vlpf"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/ActionSensor.cs" id="10_monn0"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="11_oe0ee"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/NeuralNetController.cs" id="13_skmbh"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/ArrowPhysicsMoveController.cs" id="13_tx0gm"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_l3602"]
@@ -36,7 +37,7 @@ albedo_color = Color(0.356863, 0.537255, 1, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jxcle"]
 albedo_color = Color(0.815686, 0.152941, 1, 1)
 
-[node name="Node3D" type="Node3D"]
+[node name="SimpleScene" type="Node3D"]
 
 [node name="Floor" type="StaticBody3D" parent="." groups=["Floor", "floor"]]
 
@@ -92,7 +93,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_jxcle")
 [node name="Agent" type="Node" parent="AgentBody" node_paths=PackedStringArray("avatarBody")]
 script = ExtResource("1_ckp2k")
 avatarBody = NodePath("..")
-remote = true
 doneAtNegativeReward = false
 MaxStepsPerEpisode = 3000
 
@@ -209,9 +209,12 @@ causeEpisodeToEnd = true
 script = ExtResource("13_tx0gm")
 speed = 1.0
 
+[node name="NeuralNetController" type="Node" parent="AgentBody/Agent"]
+script = ExtResource("13_skmbh")
+modelPath = "model.onnx"
+
 [node name="ControlRequestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
 script = ExtResource("8_hgrol")
-defaultTimeScale = 10.0
 stopOnQuit = true
 agentsList = [NodePath("../AgentBody/Agent")]
 
@@ -247,7 +250,8 @@ transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 3.92625,
 transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 3.92625, 1, 0.144996)
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.881995, 0.471258, 0, -0.471258, 0.881995, 0, 5.33702, 7.68783)
+transform = Transform3D(1, 0, 0, 0, 0.333132, 0.94288, 0, -0.94288, 0.333132, -1.30377, 7.9185, 7.1492)
+fov = 95.5
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.110758, 0.993847, 0, -0.993847, 0.110758, 0, 5, 0)
