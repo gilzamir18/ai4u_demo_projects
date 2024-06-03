@@ -34,7 +34,7 @@ public partial class SkeletonMinionController : Node3D, IAgentResetListener
 		if (agent != null)
 		{
 			characterBody3D = agent.GetAvatarBody() as CharacterBody3D;
-			agent.endOfStepEvent += PlayAnimation;
+			agent.OnStepEnd += PlayAnimation;
 			agent.AddResetListener(this);
 		}
 	}

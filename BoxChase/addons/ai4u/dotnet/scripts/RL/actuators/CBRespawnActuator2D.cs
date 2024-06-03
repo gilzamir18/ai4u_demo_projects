@@ -9,21 +9,27 @@ namespace ai4u
 	/// Repositioning in this class can be performed either **before** any other object is reset 
 	/// (when the "early" property is enabled) or **after** (when the "early" property is not enabled).
 	/// </summary>
-	public partial class RBRespawnActuator : Actuator
+	public partial class CBRespawnActuator2D : Actuator
 	{	
 		
 			[Export]
 			private NodePath respawnOptionsPath;
-			
+
+			[Export]
+			private bool radomizeDirection = true;
 
 			[Export]
 			private bool early = true;
 
+			[Export]
+			private bool flipWhenTurn = true;
+
+
 			private Node nodeRef;
 		
-			private RigidBody3D rBody;
+			private CharacterBody2D cBody;
 			private Godot.Collections.Array<Node> children;
-
+			
 
 			private int lastSelected = 0;
 
@@ -39,7 +45,7 @@ namespace ai4u
 			{
 				nodeRef = GetNode(respawnOptionsPath);
 				children = nodeRef.GetChildren();
-				rBody = ( (BasicAgent) agent).GetAvatarBody() as RigidBody3D;
+				cBody = ( (BasicAgent) agent).GetAvatarBody() as CharacterBody2D;
 
 				if (early)
 				{
@@ -54,40 +60,36 @@ namespace ai4u
 			
 			public void HandleReset(BasicAgent agent)
 			{
-				Transform3D reference;
+				Transform2D reference;
 				if (children.Count > 0)
 				{
 					int idx = (int)GD.RandRange(0, children.Count-1);
-					reference = ((Node3D)children[idx]).GlobalTransform;
+					reference = ((Node2D)children[idx]).GlobalTransform;
 					lastSelected = idx;
 				}
 				else
 				{
-					reference = ((Node3D) nodeRef).GlobalTransform;
+					reference = ((Node2D) nodeRef).GlobalTransform;
 					lastSelected = -1;
 				}
-				/*var mode = rBody.Mode;
-				rBody.Mode = RigidBody3D.ModeEnum.Kinematic;
-				rBody.Position = children[idx].position;
-				rBody.Mode = mode;*/
-				
-				PhysicsServer3D.BodySetState(
-					rBody.GetRid(),
-					PhysicsServer3D.BodyState.Transform,
-					reference
-				);
-				
-				PhysicsServer3D.BodySetState(
-					rBody.GetRid(),
-					PhysicsServer3D.BodyState.AngularVelocity,
-					new Vector3(0, 0, 0)
-				);	
-				
-				PhysicsServer3D.BodySetState(
-					rBody.GetRid(),
-					PhysicsServer3D.BodyState.LinearVelocity,
-					new Vector3(0, 0, 0)
-				);	
+                cBody.Velocity = Vector2.Zero;
+				cBody.Transform = reference;
+                cBody.Position = reference.Origin;
+				if (flipWhenTurn)
+				{
+					if (GD.RandRange(0, 1) > 0 && cBody.Transform.Scale.Y < 0)
+					{
+						cBody.Scale *= new Vector2(-1, 1);
+					}
+					else if (cBody.Transform.Scale.Y > 0)
+					{
+						cBody.Scale *= new Vector2(-1, 1);
+					}
+				}
+				else
+				{
+					cBody.Rotate(Mathf.DegToRad(-GD.RandRange(0, 360)));
+				}
 			}
 	}
 }

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Godot;
 using ai4u;
-using System.Diagnostics;
 
 namespace  ai4u
 {
@@ -31,7 +30,7 @@ namespace  ai4u
 
 		override public void OnSetup()
 		{
-			((BasicAgent) agent).endOfEpisodeEvent += EndEpisodeHandler;
+			((BasicAgent) agent).OnEpisodeEnd += EndEpisodeHandler;
 			_firstTime = true;
 			receivedResetAction = false;
 		}
