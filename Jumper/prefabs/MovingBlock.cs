@@ -28,7 +28,7 @@ public partial class MovingBlock : StaticBody3D
 
 	public Node3D agentTarget {get; set;} = null;
 
-	private BasicAgent agent;
+	private RLAgent agent;
 
 	private bool receivedReward = false;
 
@@ -43,7 +43,7 @@ public partial class MovingBlock : StaticBody3D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		agent = (BasicAgent)GetTree().GetFirstNodeInGroup("player").GetNode("Agent");
+		agent = (RLAgent)GetTree().GetFirstNodeInGroup("player").GetNode("Agent");
 		if (movingBlockParent == null)
 		{
 			BuildNeighborhood();

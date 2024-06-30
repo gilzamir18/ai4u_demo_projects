@@ -6,7 +6,7 @@ public partial class GameManager : Node, IAgentResetListener
 {
 
 	[Export]
-	private BasicAgent agent;
+	private RLAgent agent;
 
 	[Export]
 	private PackedScene movingBlockScene;

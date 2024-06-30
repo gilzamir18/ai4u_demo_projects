@@ -5,7 +5,7 @@ using ai4u;
 public partial class SkeletonMinionController : Node3D, IAgentResetListener
 {
 	[Export]
-	private BasicAgent agent;
+	private RLAgent agent;
 
 	private const int MOVE = 0;
 	private const int TURN = 1;
@@ -40,7 +40,7 @@ public partial class SkeletonMinionController : Node3D, IAgentResetListener
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public  void PlayAnimation(BasicAgent agent)
+	public  void PlayAnimation(RLAgent agent)
 	{
 		if (agent.Alive())
 		{

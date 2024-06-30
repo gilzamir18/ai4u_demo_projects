@@ -8,13 +8,13 @@ public partial class ShowSteps : Label
 
 	[Export]
 	private NodePath agentPath;
-	private BasicAgent agent;
+	private RLAgent agent;
 
 
 
 	public override void _Ready()
 	{
-		agent = GetNode<BasicAgent>(agentPath);
+		agent = GetNode<RLAgent>(agentPath);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

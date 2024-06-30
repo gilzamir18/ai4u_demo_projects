@@ -6,7 +6,7 @@ public partial class TargetPositions : Node, IAgentResetListener
 {
 
 	[Export]
-	private BasicAgent basicAgent;
+	private RLAgent basicAgent;
 
     [Export]
     private StaticBody3D body3D;
