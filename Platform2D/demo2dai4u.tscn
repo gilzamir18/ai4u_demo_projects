@@ -20,7 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://fnb885aqjg38" path="res://addons/sprites/SpritePack/run/frame-3.png" id="19_ceu5s"]
 [ext_resource type="Texture2D" uid="uid://cs5yvrd545owt" path="res://addons/sprites/SpritePack/run/frame-4.png" id="20_du5t6"]
 [ext_resource type="Texture2D" uid="uid://bf1gpqlb4f43i" path="res://addons/sprites/SpritePack/items/tree.png" id="21_bfm1q"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="21_mehqi"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/RLAgent.cs" id="21_mehqi"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/DiscretActuator.cs" id="21_pjfxx"]
 [ext_resource type="Script" path="res://demo2d/SpikeController.cs" id="22_jy8rt"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/ScreenSensor.cs" id="23_87605"]

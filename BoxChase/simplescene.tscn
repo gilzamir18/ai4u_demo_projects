@@ -1,6 +1,6 @@
 [gd_scene load_steps=24 format=3 uid="uid://bmnf1pmaxkvv5"]
 
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="1_ckp2k"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/RLAgent.cs" id="1_ckp2k"]
 [ext_resource type="PackedScene" uid="uid://5ikmnjyidtck" path="res://addons/ai4u/3DModel/Arrow.dae" id="1_kiqyk"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/RBMoveActuator.cs" id="3_tlu8w"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/LinearRayCastingSensor.cs" id="4_1elh4"]
@@ -93,8 +93,13 @@ surface_material_override/0 = SubResource("StandardMaterial3D_jxcle")
 [node name="Agent" type="Node" parent="AgentBody" node_paths=PackedStringArray("avatarBody")]
 script = ExtResource("1_ckp2k")
 avatarBody = NodePath("..")
+remote = true
 doneAtNegativeReward = false
 MaxStepsPerEpisode = 3000
+
+[node name="ControlRequestor" type="Node" parent="AgentBody/Agent" node_paths=PackedStringArray("agentsList")]
+script = ExtResource("8_hgrol")
+agentsList = []
 
 [node name="Actuator" type="Node" parent="AgentBody/Agent"]
 script = ExtResource("3_tlu8w")
@@ -212,11 +217,6 @@ speed = 1.0
 [node name="NeuralNetController" type="Node" parent="AgentBody/Agent"]
 script = ExtResource("13_skmbh")
 modelPath = "model.onnx"
-
-[node name="ControlRequestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
-script = ExtResource("8_hgrol")
-stopOnQuit = true
-agentsList = [NodePath("../AgentBody/Agent")]
 
 [node name="RespawnOptions" type="Node" parent="."]
 script = ExtResource("7_lwuy7")
