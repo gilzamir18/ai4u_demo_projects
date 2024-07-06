@@ -7,13 +7,13 @@
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/MinDistReward.cs" id="5_nkaqn"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/TouchRewardFunc.cs" id="6_afios"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/RBRespawnActuator.cs" id="7_lwuy7"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="8_hgrol"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/FloatArrayCompositeSensor.cs" id="8_vphps"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/OrientationSensor.cs" id="9_4vlpf"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/ActionSensor.cs" id="10_monn0"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="11_oe0ee"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/NeuralNetController.cs" id="13_skmbh"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/ArrowPhysicsMoveController.cs" id="13_tx0gm"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/Tools/RemoteStarter.cs" id="14_khuhx"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_l3602"]
 size = Vector3(10, 0.1, 10)
@@ -92,14 +92,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_jxcle")
 
 [node name="Agent" type="Node" parent="AgentBody" node_paths=PackedStringArray("avatarBody")]
 script = ExtResource("1_ckp2k")
-avatarBody = NodePath("..")
 remote = true
+avatarBody = NodePath("..")
 doneAtNegativeReward = false
 MaxStepsPerEpisode = 3000
-
-[node name="ControlRequestor" type="Node" parent="AgentBody/Agent" node_paths=PackedStringArray("agentsList")]
-script = ExtResource("8_hgrol")
-agentsList = []
 
 [node name="Actuator" type="Node" parent="AgentBody/Agent"]
 script = ExtResource("3_tlu8w")
@@ -255,3 +251,7 @@ fov = 95.5
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.110758, 0.993847, 0, -0.993847, 0.110758, 0, 5, 0)
+
+[node name="RemoteStarter" type="Node" parent="." node_paths=PackedStringArray("config")]
+script = ExtResource("14_khuhx")
+config = NodePath("@Node@22657")
