@@ -1,7 +1,7 @@
-[gd_scene load_steps=26 format=3 uid="uid://bwguxx5chuw00"]
+[gd_scene load_steps=25 format=3 uid="uid://bwguxx5chuw00"]
 
 [ext_resource type="PackedScene" uid="uid://5ikmnjyidtck" path="res://addons/ai4u/3DModel/Arrow.dae" id="1_n8dhr"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/BasicAgent.cs" id="2_2jycq"]
+[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/agents/RLAgent.cs" id="2_2jycq"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/actuators/RBMoveActuator.cs" id="3_0d0ew"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/sensors/Camera3DSensor.cs" id="4_bna63"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/MinDistReward.cs" id="5_oesql"]
@@ -13,7 +13,6 @@
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/events/FallReward.cs" id="11_jf1h7"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/NeuralNetController.cs" id="12_2uh5i"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RL/controllers/ArrowPhysicsMoveController.cs" id="13_karp3"]
-[ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControlRequestor.cs" id="13_wjgf5"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/RemoteConfiguration.cs" id="15_pu7ux"]
 [ext_resource type="Script" path="res://addons/ai4u/dotnet/scripts/ControllerConfiguration.cs" id="16_3goyg"]
 
@@ -161,11 +160,6 @@ speed = 1.0
 [node name="NeuralNetController" type="Node" parent="AgentBody/Agent"]
 script = ExtResource("12_2uh5i")
 modelPath = "model_vision.onnx"
-
-[node name="ControlRequestor" type="Node" parent="." node_paths=PackedStringArray("agentsList")]
-script = ExtResource("13_wjgf5")
-stopOnQuit = true
-agentsList = [NodePath("../AgentBody/Agent")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.881995, 0.471258, 0, -0.471258, 0.881995, 0, 5.33702, 7.68783)

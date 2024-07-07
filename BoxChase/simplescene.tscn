@@ -254,4 +254,4 @@ transform = Transform3D(1, 0, 0, 0, 0.110758, 0.993847, 0, -0.993847, 0.110758, 
 
 [node name="RemoteStarter" type="Node" parent="." node_paths=PackedStringArray("config")]
 script = ExtResource("14_khuhx")
-config = NodePath("@Node@22657")
+config = NodePath("@Node@17700")
